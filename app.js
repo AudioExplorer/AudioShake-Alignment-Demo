@@ -31,7 +31,7 @@ const elements = {
     loadUrlBtn: document.getElementById('loadUrlBtn'),
     loadDemoBtn: document.getElementById('loadDemoBtn'),
 
-    assetTitleInput: document.getElementById('assetTitleInput'),
+    // assetTitleInput: document.getElementById('assetTitleInput'),
     assetSourceURLInput: document.getElementById('assetSourceURLInput'),
     addAssetBtn: document.getElementById('addAssetBtn'),
 
@@ -350,17 +350,19 @@ async function handleURLLoad() {
     }
 }
 
-/**
- * 
- * assetTitleInput
-                            assetSourceURLInput
-                            addAssetBtn
- */
 
+
+// URL helper function
+function getFilenameFromUrlRegex(url) {
+    // Match everything after the last '/' and before any '?'
+    const match = url.match(/\/([^/?]+)(?:\?|$)/);
+    return match ? decodeURIComponent(match[1]) : null;
+}
 
 function loadNewAssetFromSource() {
     const sourceURL = elements.assetSourceURLInput.value.trim();
-    const title = elements.assetTitleInput.value || "Untitled";
+    // todo get the filename from the url 
+    const title = getFilenameFromUrlRegex(sourceURL) || "Untitled";
     const allowedExtensions = ['mp3', 'mp4', 'wav', 'flac', 'mov', 'aac'];
     const format = (() => {
         // Clean URL by removing query parameters and fragments
@@ -381,7 +383,10 @@ function loadNewAssetFromSource() {
             wav: 'audio/wav',
             flac: 'audio/flac',
             mov: 'video/quicktime',
-            aac: 'audio/aac'
+            aac: 'audio/aac',
+            mp4a: 'audio/mp4',
+            aiff: 'audio/aiff',
+            pcm: 'audio/pcm'
         };
 
         return mimeByExtension[extension];
@@ -400,8 +405,6 @@ function loadNewAssetFromSource() {
     loadAssets(newAsset.assets);
     // Proceed with asset creation or processing using `sourceURL`, `title`, and `format`
     console.log(`Asset created with URL: ${sourceURL}, Title: ${title}, MIME Type: ${format}`);
-
-
 }
 
 
@@ -452,6 +455,9 @@ function getFormatLabel(format) {
 
 function selectAsset(index) {
     state.selectedAsset = state.assets[index];
+
+    // todo update the alignment filter to be fuzzy 
+    elements.filterSource.value = state.selectedAsset.title.split(".")[0]
 
     document.querySelectorAll('.asset-card').forEach((card, i) => {
         card.classList.toggle('selected', i === index);
@@ -743,12 +749,15 @@ function closeModal(type) {
 
 // Code Examples
 function updateCodeExample(lang) {
+
+    let YOUR_API_KEY = (api.hasAPIKey) ? api.apiKey : "YOUR_API_KEY";
+
     const examples = {
         javascript: `// Create alignment task
 const response = await fetch('https://api.audioshake.ai/tasks', {
   method: 'POST',
   headers: {
-    'x-api-key': 'YOUR_API_KEY',
+    'x-api-key': '${YOUR_API_KEY}',
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
@@ -769,7 +778,7 @@ console.log('Task ID:', task.id);
 // Poll for completion
 const checkStatus = async (taskId) => {
   const response = await fetch(\`https://api.audioshake.ai/tasks/\${taskId}\`, {
-    headers: { 'x-api-key': 'YOUR_API_KEY' }
+    headers: { 'x-api-key': '${YOUR_API_KEY}' }
   });
   const task = await response.json();
   
@@ -783,7 +792,7 @@ const checkStatus = async (taskId) => {
 };`,
         curl: `# Create alignment task
 curl -X POST https://api.audioshake.ai/tasks \\
-  -H "x-api-key: YOUR_API_KEY" \\
+  -H "x-api-key: ${YOUR_API_KEY}" \\
   -H "Content-Type: application/json" \\
   -d '{
     "url": "https://example.com/audio.mp3",
@@ -798,7 +807,7 @@ curl -X POST https://api.audioshake.ai/tasks \\
 
 # Get task status
 curl https://api.audioshake.ai/tasks/TASK_ID \\
-  -H "x-api-key: YOUR_API_KEY"`,
+  -H "x-api-key: ${YOUR_API_KEY}"`,
         python: `import requests
 import time
 
@@ -806,7 +815,7 @@ import time
 response = requests.post(
     'https://api.audioshake.ai/tasks',
     headers={
-        'x-api-key': 'YOUR_API_KEY',
+        'x-api-key': '${YOUR_API_KEY}',
         'Content-Type': 'application/json'
     },
     json={
@@ -828,7 +837,7 @@ task_id = task['id']
 while True:
     status = requests.get(
         f'https://api.audioshake.ai/tasks/{task_id}',
-        headers={'x-api-key': 'YOUR_API_KEY'}
+        headers={'x-api-key': '${YOUR_API_KEY}'}
     ).json()
     
     # Find alignment target

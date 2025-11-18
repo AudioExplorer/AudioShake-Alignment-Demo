@@ -99,14 +99,27 @@
                     </button> -->
                 </div>
                 <div class="card-body">
+                    <div hidden>
+                        <div class="url-input-group">
+                            <input type="url" id="urlInput" placeholder="Enter demo-assets.json URL" class="input">
+                            <button id="loadUrlBtn" class="btn-primary">Load</button>
+                        </div>
+                    </div>
+                    <div class="note">
+                        <button id="loadDemoBtn" class="btn-text">Load Demo Assets</button>
+                    </div>
+
+                    <div class="or-divider">OR</div>
+
+                    <!-- Own assets -->
                     <div class="note">
                         <p>
                             Create asset from your source
                         <p>
                         <div class="url-input-group">
-                            <div class="left">
+                            <!-- <div class="left">
                                 <input type="text" id="assetTitleInput" placeholder="Title" class="input">
-                            </div>
+                            </div> -->
                             <input type="url" id="assetSourceURLInput"
                                 placeholder="Enter source url from a publically accessabile url or pre-signed url "
                                 class="input">
@@ -114,8 +127,8 @@
                                 <span class="icon">+</span>
                                 Add Asset</button>
                         </div>
-
                     </div>
+
                     <div class="or-divider">OR</div>
                     <div class="note">
                         <p>
@@ -132,15 +145,6 @@
                                 <input type="file" id="fileInput" accept=".json" hidden>
                             </div>
                         </div>
-                        <div class="or-divider">OR</div>
-                        <div hidden>
-                            <div class="url-input-group">
-                                <input type="url" id="urlInput" placeholder="Enter demo-assets.json URL" class="input">
-                                <button id="loadUrlBtn" class="btn-primary">Load</button>
-                            </div>
-                        </div>
-
-                        <button id="loadDemoBtn" class="btn-text">Load Demo Assets</button>
                     </div>
             </section>
 

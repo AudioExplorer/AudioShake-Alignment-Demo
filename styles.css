@@ -361,6 +361,8 @@ body {
     color: var(--text-secondary);
     font-size: 0.875rem;
     position: relative;
+    padding-top: 1em;
+    padding-bottom: 1em;
 }
 
 .or-divider::before,
