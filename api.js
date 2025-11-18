@@ -200,7 +200,45 @@ class AudioShakeAPI {
     }
 
     // Poll Task Status
-    async pollTask(taskId, onUpdate, maxAttempts = 60, interval = 2000) {
+    async pollTask(taskId, onUpdate, maxAttempts = 60, interval = 4000) {
+        let attempts = 0;
+        return new Promise((resolve, reject) => {
+            const poll = async () => {
+                try {
+                    attempts++;
+                    const task = await this.getTask(taskId);
+
+                    if (onUpdate) {
+                        onUpdate(task);
+                    }
+
+                    // ✅ Check the first target's status
+                    const target = task.targets?.[0];
+
+                    if (!target) {
+                        reject(new Error('No targets found in task'));
+                        return;
+                    }
+
+                    if (target.status === 'completed') {
+                        resolve(task);
+                    } else if (target.status === 'failed') {
+                        reject(new Error(target.error || 'Task failed'));
+                    } else if (attempts >= maxAttempts) {
+                        reject(new Error('Polling timeout - task still processing'));
+                    } else {
+                        setTimeout(poll, interval);
+                    }
+                } catch (err) {
+                    reject(err);
+                }
+            };
+            poll();
+        });
+    }
+
+    // older version
+    async pollTaskOLD(taskId, onUpdate, maxAttempts = 60, interval = 4000) {
         let attempts = 0;
 
         return new Promise((resolve, reject) => {

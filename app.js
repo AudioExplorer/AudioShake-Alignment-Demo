@@ -517,7 +517,7 @@ async function createAlignment() {
             }
         }
     } catch (err) {
-        showToast(`Error: ${err.message}`);
+        showToast(`Error: ${err.message}`);  // ✅ Correct
         addDebugEntry({ error: err.message }, 'error');
     }
 }
