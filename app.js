@@ -751,6 +751,7 @@ function closeModal(type) {
 function updateCodeExample(lang) {
 
     let YOUR_API_KEY = (api.hasAPIKey) ? api.apiKey : "YOUR_API_KEY";
+    let sourceURL = (state.selectedAsset != undefined) ? state.selectedAsset.src : 'https://example.com/audio.mp3'
 
     const examples = {
         javascript: `// Create alignment task
@@ -761,7 +762,7 @@ const response = await fetch('https://api.audioshake.ai/tasks', {
     'Content-Type': 'application/json'
   },
   body: JSON.stringify({
-    url: 'https://example.com/audio.mp3',
+    url: '${sourceURL}',
     targets: [
       {
         model: 'alignment',
@@ -795,7 +796,7 @@ curl -X POST https://api.audioshake.ai/tasks \\
   -H "x-api-key: ${YOUR_API_KEY}" \\
   -H "Content-Type: application/json" \\
   -d '{
-    "url": "https://example.com/audio.mp3",
+    "url": "${sourceURL}",
     "targets": [
       {
         "model": "alignment",
@@ -819,7 +820,7 @@ response = requests.post(
         'Content-Type': 'application/json'
     },
     json={
-        'url': 'https://example.com/audio.mp3',
+        'url': '${sourceURL}',
         'targets': [
             {
                 'model': 'alignment',
