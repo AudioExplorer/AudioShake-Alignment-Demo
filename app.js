@@ -405,17 +405,9 @@ function loadNewAssetFromSource() {
 }
 
 
-
-
 function loadDemoAssets() {
     const demoData = {
         "assets": [
-            {
-                "src": "https://audioshake.s3.us-east-1.amazonaws.com/demo-assets/surfing.mp4?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=AKIA4HDN2YLZIASF33OU%2F20251118%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20251118T052256Z&X-Amz-Expires=576000&X-Amz-Signature=734b1133ca2bc8eba57ad9d21b66d1aff502621424bfeee6f41da69ddf98c954&X-Amz-SignedHeaders=host&x-amz-checksum-mode=ENABLED&x-id=GetObject",
-                "title": "surfing.mp4",
-                "format": "video/mp4",
-                "expiry": "2025-11-24T21:22:56.813Z"
-            },
             {
                 "src": "https://spatial-explorer.s3.us-east-1.amazonaws.com/spatial-Tech-Startups-DisneyAccelerator-Demo-Day-2024.mp4",
                 "title": "DisneyAccelerator-Demo-Day-2024.mp4",
