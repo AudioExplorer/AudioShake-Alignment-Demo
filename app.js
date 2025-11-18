@@ -544,6 +544,38 @@ async function loadAlignments() {
     }
 }
 
+// helper for copy task ID
+// Add this as an onclick handler directly
+function copyTaskId(element) {
+    const taskId = element.textContent;
+
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(taskId).then(() => {
+            showCopyFeedback(element);
+        }).catch(() => copyFallback(taskId, element));
+    } else {
+        copyFallback(taskId, element);
+    }
+}
+
+function copyFallback(text, element) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';
+    textarea.style.opacity = '0';
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    showCopyFeedback(element);
+}
+
+function showCopyFeedback(element) {
+    const original = element.textContent;
+    element.textContent = '✓ Copied!';
+    setTimeout(() => element.textContent = original, 2000);
+}
+
 function renderAlignments() {
     elements.alignmentsList.innerHTML = '';
 
@@ -564,7 +596,8 @@ function renderAlignments() {
 
         item.innerHTML = `
             <div class="alignment-header">
-                <span class="alignment-id">${task.id}</span>
+            <!--   <span class="alignment-id">${task.id}</span>  -->
+                <span class="alignment-id" onclick="copyTaskId(this)" style="cursor: pointer;">${task.id}</span>
                 <span class="status-badge ${alignmentTarget.status}">${alignmentTarget.status}</span>
             </div>
             <div class="alignment-info">
