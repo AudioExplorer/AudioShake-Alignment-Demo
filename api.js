@@ -19,8 +19,9 @@ class AudioShakeAPI {
 
             request.onsuccess = () => {
                 this.db = request.result;
-                this.loadStoredKey();
                 resolve();
+                // Call loadStoredKey after a tick to ensure DB is ready
+                setTimeout(() => this.loadStoredKey(), 0);
             };
 
             request.onupgradeneeded = (e) => {
