@@ -19,8 +19,8 @@ const elements = {
 
     // Sidebar
     sidebar: document.getElementById('sidebar'),
-    sidebarToggle: document.getElementById('sidebarToggle'),
-    sidebarOpenBtn: document.getElementById('sidebarOpenBtn'),
+    // sidebarToggle: document.getElementById('sidebarToggle'),
+    // sidebarOpenBtn: document.getElementById('sidebarOpenBtn'),
     debugOutput: document.getElementById('debugOutput'),
     clearDebug: document.getElementById('clearDebug'),
 
@@ -166,6 +166,7 @@ function setupEventListeners() {
         tab.addEventListener('click', (e) => {
             document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
             e.target.classList.add('active');
+            console.log("Selected Lang: ", e.target.dataset.lang)
             updateCodeExample(e.target.dataset.lang);
         });
     });
@@ -780,124 +781,6 @@ function closeModal(type) {
     }
 }
 
-// Code Examples
-function updateCodeExample(lang) {
-
-    let YOUR_API_KEY = (api.hasAPIKey) ? api.apiKey : "YOUR_API_KEY";
-    let sourceURL = (state.selectedAsset != undefined) ? state.selectedAsset.src : 'https://example.com/audio.mp3'
-
-    const examples = {
-        javascript: `// Create alignment task
-const response = await fetch('https://api.audioshake.ai/tasks', {
-  method: 'POST',
-  headers: {
-    'x-api-key': '${YOUR_API_KEY}',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify({
-    url: '${sourceURL}',
-    targets: [
-      {
-        model: 'alignment',
-        formats: ['json'],
-        language: 'en'
-      }
-    ]
-  })
-});
-
-const task = await response.json();
-console.log('Task ID:', task.id);
-
-// Poll for completion
-const checkStatus = async (taskId) => {
-  const response = await fetch(\`https://api.audioshake.ai/tasks/\${taskId}\`, {
-    headers: { 'x-api-key': '${YOUR_API_KEY}' }
-  });
-  const task = await response.json();
-  
-  // Find alignment target
-  const alignmentTarget = task.targets.find(t => t.model === 'alignment');
-  if (alignmentTarget.status === 'completed') {
-    const output = alignmentTarget.output.find(o => o.format === 'json');
-    console.log('Alignment URL:', output.link);
-  }
-  return task;
-};`,
-        curl: `# Create alignment task
-curl -X POST https://api.audioshake.ai/tasks \\
-  -H "x-api-key: ${YOUR_API_KEY}" \\
-  -H "Content-Type: application/json" \\
-  -d '{
-    "url": "${sourceURL}",
-    "targets": [
-      {
-        "model": "alignment",
-        "formats": ["json"],
-        "language": "en"
-      }
-    ]
-  }'
-
-# Get task status
-curl https://api.audioshake.ai/tasks/TASK_ID \\
-  -H "x-api-key: ${YOUR_API_KEY}"`,
-        python: `import requests
-import time
-
-# Create alignment task
-response = requests.post(
-    'https://api.audioshake.ai/tasks',
-    headers={
-        'x-api-key': '${YOUR_API_KEY}',
-        'Content-Type': 'application/json'
-    },
-    json={
-        'url': '${sourceURL}',
-        'targets': [
-            {
-                'model': 'alignment',
-                'formats': ['json'],
-                'language': 'en'
-            }
-        ]
-    }
-)
-
-task = response.json()
-task_id = task['id']
-
-# Poll for completion
-while True:
-    status = requests.get(
-        f'https://api.audioshake.ai/tasks/{task_id}',
-        headers={'x-api-key': '${YOUR_API_KEY}'}
-    ).json()
-    
-    # Find alignment target
-    alignment_target = next(t for t in status['targets'] if t['model'] == 'alignment')
-    
-    if alignment_target['status'] == 'completed':
-        output = next(o for o in alignment_target['output'] if o['format'] == 'json')
-        print('Alignment URL:', output['link'])
-        break
-    
-    time.sleep(2)`
-    };
-
-    elements.codeContent.textContent = examples[lang] || examples.javascript;
-}
-
-function copyCode() {
-    const code = elements.codeContent.textContent;
-    navigator.clipboard.writeText(code).then(() => {
-        const originalText = elements.copyCodeBtn.textContent;
-        elements.copyCodeBtn.textContent = 'Copied!';
-        setTimeout(() => {
-            elements.copyCodeBtn.textContent = originalText;
-        }, 2000);
-    });
-}
 
 // Toast
 function showToast(message, duration = 3000) {

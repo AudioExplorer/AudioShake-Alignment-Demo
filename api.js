@@ -237,37 +237,6 @@ class AudioShakeAPI {
         });
     }
 
-    // older version
-    async pollTaskOLD(taskId, onUpdate, maxAttempts = 60, interval = 4000) {
-        let attempts = 0;
-
-        return new Promise((resolve, reject) => {
-            const poll = async () => {
-                try {
-                    attempts++;
-                    const task = await this.getTask(taskId);
-
-                    if (onUpdate) {
-                        onUpdate(task);
-                    }
-
-                    if (task.status === 'completed') {
-                        resolve(task);
-                    } else if (task.status === 'failed') {
-                        reject(new Error(task.error || 'Task failed'));
-                    } else if (attempts >= maxAttempts) {
-                        reject(new Error('Polling timeout - task still processing'));
-                    } else {
-                        setTimeout(poll, interval);
-                    }
-                } catch (err) {
-                    reject(err);
-                }
-            };
-
-            poll();
-        });
-    }
 
     // Fetch Alignment JSON
     async fetchAlignment(url) {

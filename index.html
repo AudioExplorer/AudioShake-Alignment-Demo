@@ -37,9 +37,6 @@
         <aside id="sidebar" class="sidebar">
             <div class="sidebar-header">
                 <h2>API Console</h2>
-                <!-- <button id="consoleToggle" class="btn-icon">
-                    <span class="icon">✕</span>
-                </button> -->
             </div>
 
             <div class="sidebar-content">
@@ -204,10 +201,7 @@
         </main>
     </div>
 
-    <!-- Sidebar Toggle Button (Mobile) -->
-    <!-- <button id="sidebarOpenBtn" class="sidebar-open-btn">
-        <span class="icon">☰</span>
-    </button> -->
+
 
     <!-- Auth Modal -->
     <div id="authModal" class="modal">
@@ -239,8 +233,10 @@
             <div class="modal-body">
                 <div class="code-tabs">
                     <button class="code-tab active" data-lang="javascript">JavaScript</button>
+                    <button class="code-tab" data-lang="node">Node</button>
                     <button class="code-tab" data-lang="curl">cURL</button>
                     <button class="code-tab" data-lang="python">Python</button>
+                    <button class="code-tab" data-lang="swift">Swift</button>
                 </div>
                 <div class="code-container">
                     <button class="copy-btn" id="copyCodeBtn">Copy</button>
@@ -254,6 +250,7 @@
     <div id="taskToast" class="toast"></div>
 
     <script src="api.js"></script>
+    <script src="code.js"></script>
     <script src="app.js"></script>
 </body>
 
