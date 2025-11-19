@@ -35,6 +35,7 @@ audioshake-alignment-demo/
 ├── styles.css       # Complete styling with theme support
 ├── app.js           # Application logic and UI management
 ├── api.js           # AudioShake API client
+├── code.js          # Live Code Examples
 └── README.md        # This file
 ```
 
