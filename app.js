@@ -414,10 +414,16 @@ function loadDemoAssets() {
     const demoData = {
         "assets": [
             {
-                "src": "https://spatial-explorer.s3.us-east-1.amazonaws.com/spatial-Tech-Startups-DisneyAccelerator-Demo-Day-2024.mp4",
-                "title": "DisneyAccelerator-Demo-Day-2024.mp4",
+                "src": "https://demos.spatial-explorer.com/demo-assets/surfing.mp4",
+                "title": "surfing.mp4",
                 "format": "video/mp4",
-                "expiry": "2025-11-24T21:43:53.555Z"
+                "expiry": null
+            },
+            {
+                "src": "https://demos.spatial-explorer.com/demo-assets/Wordless.mp4",
+                "title": "Wordless.mp4",
+                "format": "video/mp4",
+                "expiry": null
             }
         ]
     };
