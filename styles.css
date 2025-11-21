@@ -21,6 +21,71 @@
     --transition: 0.2s ease;
 }
 
+.tools-left.hidden {
+    visibility: hidden;
+}
+
+
+/* CSS for always-editable lyrics with playback alignment */
+
+/* Word spans - always editable */
+.word {
+    display: inline-block;
+    padding: 4px 6px;
+    margin: 2px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    cursor: text;
+    background: transparent;
+}
+
+.word:hover {
+    background: #e9ecef;
+}
+
+/* Active word during playback */
+.word.active {
+    background: #4dabf7;
+    color: white;
+    font-weight: 600;
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(77, 171, 247, 0.4);
+}
+
+/* Input field when editing */
+.word-input {
+    display: inline-block;
+    padding: 4px 8px;
+    margin: 2px;
+    border: 2px solid #4dabf7;
+    border-radius: 4px;
+    font-size: inherit;
+    font-family: inherit;
+    background: white;
+    color: #212529;
+    outline: none;
+    box-shadow: 0 2px 8px rgba(77, 171, 247, 0.3);
+    min-width: 60px;
+    animation: inputFadeIn 0.2s ease;
+}
+
+@keyframes inputFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.word-input:focus {
+    border-color: #1971c2;
+    box-shadow: 0 3px 12px rgba(25, 113, 194, 0.4);
+}
+
 [data-theme="dark"] {
     --bg-primary: #111827;
     --bg-secondary: #1f2937;

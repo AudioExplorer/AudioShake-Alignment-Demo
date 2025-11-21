@@ -7,7 +7,9 @@ const state = {
     selectedAlignment: null,
     currentMedia: null,
     theme: localStorage.getItem('theme') || 'light',
-    displaySidebar: true
+    displaySidebar: true,
+    selectedAlignmentJSON: null,
+    editingSelectedAlignment: false
 };
 
 // DOM Elements
@@ -58,6 +60,10 @@ const elements = {
     skipInput: document.getElementById('skipInput'),
     takeInput: document.getElementById('takeInput'),
 
+    // alignment tools
+    alignmentTools: document.getElementById('alignmentTools'),
+    downloadAlignmentButton: document.getElementById('downloadAlignmentButton'),
+
     // Modals
     authModal: document.getElementById('authModal'),
     apiKeyInput: document.getElementById('apiKeyInput'),
@@ -79,6 +85,7 @@ async function init() {
     setupAPIListeners();
     await api.dbReady;
     checkAuth();
+    toggleAlignmentTools(false)
 }
 
 // Theme
@@ -145,6 +152,11 @@ function setupEventListeners() {
     elements.filterSource.addEventListener('input', filterAlignments);
     elements.skipInput.addEventListener('change', loadAlignments);
     elements.takeInput.addEventListener('change', loadAlignments);
+
+    // alignment tools
+    elements.downloadAlignmentButton.addEventListener('click', downloadJSON);
+
+
 
     // Media Player Events
     elements.mediaPlayer.addEventListener('timeupdate', updateLyricHighlight);
@@ -424,6 +436,12 @@ function loadDemoAssets() {
                 "title": "Wordless.mp4",
                 "format": "video/mp4",
                 "expiry": null
+            },
+            {
+                "src": "https://demos.spatial-explorer.com/demo-assets/Andrew-Bundy-Promo-HD.mp4",
+                "title": "Andrew-Bundy-Promo-HD.mp4",
+                "format": "video/mp4",
+                "expiry": null
             }
         ]
     };
@@ -462,6 +480,7 @@ function getFormatLabel(format) {
 }
 
 function selectAsset(index) {
+    clearAlignments()
     state.selectedAsset = state.assets[index];
 
     // todo update the alignment filter to be fuzzy 
@@ -680,8 +699,43 @@ function selectAlignment(index) {
     loadAlignmentData(alignmentOutput.link);
 }
 
+function toggleAlignmentTools(show) {
+
+    if (show) {
+        elements.alignmentTools.classList.remove('hidden');
+
+    } else {
+        elements.alignmentTools.classList.add('hidden');
+    }
+
+
+
+    // downloadAlignmentButton
+    // editAlignmenButton
+
+}
+
+function downloadJSON() {
+    let json = state.selectedAlignmentJSON
+    const data = JSON.stringify(json, null, 2); // pretty-print
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "alignment.json";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+}
+
+
+
 async function loadAlignmentData(alignmentUrl) {
     try {
+        toggleAlignmentTools(true)
         addDebugEntry({ info: `Fetching alignment from: ${alignmentUrl}` }, 'info');
         const data = await api.fetchAlignment(alignmentUrl);
         addDebugEntry({ success: 'Alignment data loaded', structure: Object.keys(data) }, 'success');
@@ -692,11 +746,17 @@ async function loadAlignmentData(alignmentUrl) {
     }
 }
 
+function clearAlignments() {
+    elements.lyricsContainer.innerHTML = 'Select an alignment or create a new one to view synced lyrics';
+    toggleAlignmentTools(false)
+}
+
+// Simplified renderLyrics method - always editable with playback alignment
 function renderLyrics(alignmentData) {
+    state.selectedAlignmentJSON = alignmentData;
     elements.lyricsContainer.innerHTML = '';
 
     let lines = [];
-
     if (alignmentData.lines) {
         lines = alignmentData.lines;
     } else if (alignmentData.words) {
@@ -715,14 +775,14 @@ function renderLyrics(alignmentData) {
 
     let totalWords = 0;
 
-    lines.forEach((lineData) => {
+    lines.forEach((lineData, lineIndex) => {
         const words = lineData.words || [];
         if (words.length === 0) return;
 
         const lineDiv = document.createElement('div');
         lineDiv.className = 'lyrics-line';
 
-        words.forEach((wordData, index) => {
+        words.forEach((wordData, wordIndex) => {
             const wordText = wordData.text || wordData.word || '';
             const start = wordData.start || wordData.startTime || 0;
             const end = wordData.end || wordData.endTime || 0;
@@ -733,11 +793,13 @@ function renderLyrics(alignmentData) {
             span.dataset.start = start;
             span.dataset.end = end;
             span.dataset.index = totalWords;
+            span.dataset.lineIndex = lineIndex;
+            span.dataset.wordIndex = wordIndex;
 
-            span.addEventListener('click', () => {
-                if (state.currentMedia) {
-                    state.currentMedia.currentTime = start;
-                }
+            // Click to edit
+            span.addEventListener('click', (e) => {
+                e.stopPropagation();
+                convertToInput(span, lineIndex, wordIndex);
             });
 
             lineDiv.appendChild(span);
@@ -749,6 +811,126 @@ function renderLyrics(alignmentData) {
 
     addDebugEntry({ success: `Loaded ${totalWords} words in ${lines.length} lines` }, 'success');
 }
+
+// Convert span to input for editing
+function convertToInput(span, lineIndex, wordIndex) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'word-input';
+    input.value = span.textContent;
+    input.dataset.start = span.dataset.start;
+    input.dataset.end = span.dataset.end;
+    input.dataset.index = span.dataset.index;
+    input.dataset.lineIndex = lineIndex;
+    input.dataset.wordIndex = wordIndex;
+
+    // Set media player to this word's timestamp
+    if (state.currentMedia) {
+        state.currentMedia.currentTime = parseFloat(span.dataset.start);
+    }
+
+    // Replace span with input
+    span.parentElement.replaceChild(input, span);
+    input.focus();
+    input.select();
+
+    // Save on blur
+    input.addEventListener('blur', () => {
+        saveEdit(input);
+    });
+
+    // Save on Enter, cancel on Escape
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            saveEdit(input);
+        } else if (e.key === 'Escape') {
+            e.preventDefault();
+            cancelEdit(input);
+        }
+    });
+}
+
+// Save edit and convert back to span
+function saveEdit(input) {
+    const newText = input.value.trim();
+    const lineIndex = parseInt(input.dataset.lineIndex);
+    const wordIndex = parseInt(input.dataset.wordIndex);
+    const start = parseFloat(input.dataset.start);
+    const end = parseFloat(input.dataset.end);
+
+    // Update the JSON
+    if (state.selectedAlignmentJSON.lines &&
+        state.selectedAlignmentJSON.lines[lineIndex] &&
+        state.selectedAlignmentJSON.lines[lineIndex].words[wordIndex]) {
+
+        const originalText = state.selectedAlignmentJSON.lines[lineIndex].words[wordIndex].text || '';
+        const trailingWhitespace = originalText.match(/\s*$/)?.[0] || '';
+
+        // Update word text with preserved whitespace
+        state.selectedAlignmentJSON.lines[lineIndex].words[wordIndex].text = newText + trailingWhitespace;
+
+        // Update line text
+        const line = state.selectedAlignmentJSON.lines[lineIndex];
+        line.text = line.words.map(w => w.text || w.word || '').join('');
+
+        // Update full text
+        if (state.selectedAlignmentJSON.text !== undefined) {
+            state.selectedAlignmentJSON.text = state.selectedAlignmentJSON.lines
+                .map(l => l.text || l.words.map(w => w.text || w.word || '').join(''))
+                .join('');
+        }
+    }
+
+    // Convert back to span
+    const span = document.createElement('span');
+    span.className = 'word';
+    span.textContent = newText;
+    span.dataset.start = input.dataset.start;
+    span.dataset.end = input.dataset.end;
+    span.dataset.index = input.dataset.index;
+    span.dataset.lineIndex = input.dataset.lineIndex;
+    span.dataset.wordIndex = input.dataset.wordIndex;
+
+    span.addEventListener('click', (e) => {
+        e.stopPropagation();
+        convertToInput(span, parseInt(span.dataset.lineIndex), parseInt(span.dataset.wordIndex));
+    });
+
+    input.parentElement.replaceChild(span, input);
+}
+
+// Cancel edit and revert to original text
+function cancelEdit(input) {
+    const lineIndex = parseInt(input.dataset.lineIndex);
+    const wordIndex = parseInt(input.dataset.wordIndex);
+
+    // Get original text
+    let originalText = '';
+    if (state.selectedAlignmentJSON.lines &&
+        state.selectedAlignmentJSON.lines[lineIndex] &&
+        state.selectedAlignmentJSON.lines[lineIndex].words[wordIndex]) {
+        originalText = state.selectedAlignmentJSON.lines[lineIndex].words[wordIndex].text || '';
+    }
+
+    // Convert back to span with original text
+    const span = document.createElement('span');
+    span.className = 'word';
+    span.textContent = originalText.trim();
+    span.dataset.start = input.dataset.start;
+    span.dataset.end = input.dataset.end;
+    span.dataset.index = input.dataset.index;
+    span.dataset.lineIndex = input.dataset.lineIndex;
+    span.dataset.wordIndex = input.dataset.wordIndex;
+
+    span.addEventListener('click', (e) => {
+        e.stopPropagation();
+        convertToInput(span, parseInt(span.dataset.lineIndex), parseInt(span.dataset.wordIndex));
+    });
+
+    input.parentElement.replaceChild(span, input);
+}
+
 
 function updateLyricHighlight() {
     if (!state.currentMedia) return;

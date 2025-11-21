@@ -14,7 +14,7 @@
         <div class="nav-content">
             <div class="nav-left">
                 <img src="Audioshake-Developers-logo-Light-theme.png" alt="AudioShake" class="logo">
-                <h1 class="nav-title">Lyrics Alignment Demo</h1>
+                <h1 class="nav-title">AudioShake API Alignment Demo</h1>
             </div>
             <div class="nav-right">
 
@@ -80,6 +80,9 @@
                 </div>
                 <div class="card-body">
                     <div class="">
+                        <p><b>We demontrate how to create a alignment JSON file from an audio asset with vocals, dialog
+                                or
+                                lyrics. </b></p>
                         <p>Load Assets</p>
                         <p>Select Asset to Play</p>
                         <p>Create Alignment or Select Existing Alignment from Alignments List</p>
@@ -170,11 +173,23 @@
                             <video id="mediaPlayer" controls></video>
                             <audio id="audioPlayer" controls></audio>
                         </div>
-                        <div class="lyrics-container" id="lyricsContainer">
-                            <div class="lyrics-placeholder">
-                                Select an alignment or create a new one to view synced lyrics
+                        <div class="media-wrapper">
+
+                            <div class="tools-left" id="alignmentTools">
+                                <button id="downloadAlignmentButton" class="btn-secondary">Download Alignment
+                                </button>
+                            </div>
+
+
+                            <div class="lyrics-container" id="lyricsContainer">
+
+                                <div class="lyrics-placeholder">
+                                    Select an alignment or create a new one to view synced lyrics
+                                </div>
                             </div>
                         </div>
+
+
                     </div>
                 </div>
             </section>
