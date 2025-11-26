@@ -14,7 +14,7 @@ A modern, browser-based application for testing the AudioShake Lyrics Alignment 
 - **Code Examples**: View API usage in JavaScript, cURL, and Python
 - **Modern UI**: Clean, responsive design with dark mode support
 
-## Quick Start
+## Quickstart
 
 1. **Open `index.html`** in a modern web browser
 2. **Authorize**: Click "Authorize" and enter your AudioShake API key
